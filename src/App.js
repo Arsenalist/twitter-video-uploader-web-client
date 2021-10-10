@@ -5,9 +5,16 @@ import { makeStyles } from '@material-ui/core/styles';
 
 
 import React from 'react';
-import { Button, TextField, Container, Card, Divider } from '@material-ui/core';
-
+import { Button, TextField, Container } from '@material-ui/core';
+import Table from "@material-ui/core/Table";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
+var client;
 function App() {
+  const [tweet, setTweet] = useState([])
+  const [delay, setDelay] = useState(0)
+  const [status, setStatus] = useState("")
+
   const useStyles = makeStyles((theme) => ({
     root: {
       '& > *': {
@@ -16,33 +23,36 @@ function App() {
     },
   }));
 
-  const [tweet, setTweet] = useState([])
-  const [delay, setDelay] = useState(0)
   var W3CWebSocket = require('websocket').w3cwebsocket;
 
-  var client = new W3CWebSocket('ws://192.168.86.24:8888/', 'echo-protocol');
-  client.onerror = function() {
-    console.log('Connection Error');
-  };
+  useEffect(() => {
+    client = new W3CWebSocket('ws://localhost:8888/', 'echo-protocol');
 
-  client.onopen = function() {
-    console.log('WebSocket Client Connected');
-  };
+    client.onerror = function() {
+      setStatus('Error')
+    };
 
-  client.onclose = function() {
-    console.log('echo-protocol Client Closed');
-  };
+    client.onopen = function() {
+      setStatus('Connected')
+    };
 
-  client.onmessage = function(e) {
-    const data = JSON.parse(e.data)
-    console.log(data)
-    if (data.action === 'tweetRequest') {
-      tweet.push({id: data.id})
-      setTweet([...tweet])
-    }
-  };
-  console.log("client after ons", client)
+    client.onclose = function() {
+      setStatus('Closed')
+    };
 
+    client.onmessage = function(e) {
+      const data = JSON.parse(e.data)
+      if (data.action === 'tweetRequest') {
+        const found = findById(data.id)
+        if (found.length === 0) {
+          let newTweet = [...tweet]
+          newTweet.push({id: data.id, thumb: data.thumb})
+          setTweet(t => [...t, ...newTweet])
+        }
+      }
+    };
+
+  }, []);
 
 
   const saveVideo = () => {
@@ -52,43 +62,70 @@ function App() {
     }, delay * 1000)
   }
 
-  const sendTweet = (myId) => {
-    const t = tweet.filter(t => t.id === myId)
+  function findById(myId) {
+    return tweet.filter(t => t.id === myId)
+  }
+
+  const processVideo = (myId, action) => {
+    const t = findById(myId);
     if (t.length !== 0) {
-      let data = JSON.stringify({action: "sendTweet", id: t[0].id, text: t[0].text});
-      console.log(data)
-      client.send(data);
+      if (t[0].text) {
+        let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text});
+        client.send(data);
+        clearTweet(myId);
+      }
     }
   }
 
   const clearTweet = (myId) => {
-    const t = tweet.filter(t => t.id !== myId)
-    setTweet(t)
+    setTweet(old => tweet.filter(t => t.id !== myId))
   }
 
 
   function updateText(id, value) {
-    const t = tweet.filter(t => t.id === id)
-    if (t.length !== 0) {
-      t[0].text = value
-    }
-    setTweet(tweet)
+    setTweet(old => {
+      const t = findById(id, old)
+      if (t.length !== 0) {
+        t[0].text = value
+      }
+      return t
+    })
   }
   const classes = useStyles();
   return (
-      <Container maxWidth="sm" className={classes.root}>
-        <TextField className={classes.root} fullWidth label="Delay" variant="outlined" onChange={(e) => setDelay(e.target.value)}  />
-
+      <Container maxWidth="lg" className={classes.root}>
+        <div id="status">{status}</div>
       <Button color={"primary"} variant={"contained"} onClick={() => saveVideo()}>Save Video</Button>
+      <Table>
       {
         tweet.map(t => (
-            <Card variant={"elevation"} className={classes.root}>
-              <TextField className={classes.root} fullWidth label="Tweet" variant="outlined" onChange={(e) => updateText(t.id, e.target.value)}  />
-              <Button  className={classes.root}  color={"primary"} variant={"contained"}  onClick={() => sendTweet(t.id)}>Send Tweet</Button>
-              <Button  className={classes.root}  color={"primary"} variant={"outlined"}  onClick={() => clearTweet(t.id)}>Clear</Button>
-            </Card>
+      <>
+        <TableRow>
+          <TableCell>
+            <TextField className={classes.root} fullWidth label="Video title" variant="outlined" onChange={(e) => updateText(t.id, e.target.value)}  />
+            {t.id}
+          </TableCell>
+          <TableCell>
+            <video width="320" height="180" controls muted>
+              <source src={t.thumb} type="video/mp4"/>
+              Your browser does not support the video tag.
+            </video>
+          </TableCell>
+          <TableCell>
+            <Button  className={classes.root}  size="small" color={"primary"} variant={"contained"}  onClick={() => processVideo(t.id, 'saveAndSendTweet')}>Send Tweet</Button>
+          </TableCell>
+          <TableCell>
+            <Button  className={classes.root}  size="small" color={"primary"} variant={"outlined"}  onClick={() => processVideo(t.id, 'saveVideoWithNameOnly')}>Save</Button>
+          </TableCell>
+          <TableCell>
+            <Button  className={classes.root}  size="small" color={"primary"} variant={"outlined"}  onClick={() => clearTweet(t.id)}>Clear</Button>
+          </TableCell>
+        </TableRow>
+</>
+
         ))
       }
+      </Table>
       </Container>
   );
 }
