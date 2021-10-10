@@ -1,11 +1,7 @@
 import './App.css';
-import {useState, useEffect} from 'react'
-import { makeStyles } from '@material-ui/core/styles';
-
-
-
-import React from 'react';
-import { Button, TextField, Container } from '@material-ui/core';
+import React, {useEffect, useState} from 'react'
+import {makeStyles} from '@material-ui/core/styles';
+import {Button, Container, TextField} from '@material-ui/core';
 import Table from "@material-ui/core/Table";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
@@ -83,12 +79,14 @@ function App() {
 
 
   function updateText(id, value) {
+    console.log("update text", id, value)
     setTweet(old => {
-      const t = findById(id, old)
-      if (t.length !== 0) {
-        t[0].text = value
-      }
-      return t
+      return old.map(t => {
+        if (t.id === id) {
+          t.text = value
+        }
+        return t
+      })
     })
   }
   const classes = useStyles();
