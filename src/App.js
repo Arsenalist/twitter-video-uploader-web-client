@@ -8,7 +8,7 @@ import TableCell from "@material-ui/core/TableCell";
 var client;
 function App() {
   const [tweet, setTweet] = useState([])
-  const [delay, setDelay] = useState(0)
+  const [delay] = useState(0)
   const [status, setStatus] = useState("")
 
   const useStyles = makeStyles((theme) => ({
