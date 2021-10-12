@@ -29,18 +29,22 @@ function App() {
     client = new W3CWebSocket('ws://localhost:8888/', 'echo-protocol');
 
     client.onerror = function() {
+      console.log("error")
       setStatus('Error')
     };
 
     client.onopen = function() {
+      console.log("open")
       setStatus('Connected')
     };
 
     client.onclose = function() {
+      console.log("close")
       setStatus('Closed')
     };
 
     client.onmessage = function(e) {
+      console.log("onmessage", e.data)
       const data = JSON.parse(e.data)
       if (data.action === 'tweetRequest') {
         const found = findById(data.id)
