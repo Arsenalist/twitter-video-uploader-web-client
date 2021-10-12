@@ -9,7 +9,6 @@ var client;
 function App() {
   const [tweet, setTweet] = useState([])
   const [timeMarkers, setTimeMarkers] = useState({})
-  const [delay] = useState(0)
   const [status, setStatus] = useState("")
 
   const useStyles = makeStyles((theme) => ({
@@ -38,9 +37,7 @@ function App() {
     };
 
     client.onmessage = function(e) {
-      console.log("raw message: ", e.data)
       const data = JSON.parse(e.data)
-      console.log("new message: ", data)
       if (data.action === 'tweetRequest') {
         const found = findById(data.id)
         if (found.length === 0) {
@@ -55,17 +52,13 @@ function App() {
 
 
   const saveReplay = () => {
-    setTimeout(()=> {
-      let data = JSON.stringify({action: "saveReplay"});
-      client.send(data);
-    }, delay * 1000)
+    let data = JSON.stringify({action: "saveReplay"});
+    client.send(data);
   }
 
   const saveVideo = () => {
-    setTimeout(()=> {
-      let data = JSON.stringify({action: "saveVideo"});
-      client.send(data);
-    }, delay * 1000)
+    let data = JSON.stringify({action: "saveVideo"});
+    client.send(data);
   }
 
   function findById(myId) {
@@ -111,7 +104,6 @@ function App() {
       newTimeMarker[id] = e.target.currentTime
       return newTimeMarker
     })
-    console.log(timeMarkers)
   }
   const setIn = (id, e) => {
     if (id in timeMarkers) {
@@ -159,7 +151,7 @@ function App() {
       {
         tweet.map(t => (
       <>
-        <TableRow>
+        <TableRow key={`row-${t.id}`}>
           <TableCell>
             <TextField key={`textfield-${t.id}`} className={classes.root} fullWidth label="Video title" variant="outlined" onChange={(e) => updateText(t.id, e.target.value)}  />
             {t.id}
