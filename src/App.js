@@ -52,7 +52,7 @@ function App() {
       }
     };
 
-  }, [W3CWebSocket, ]);
+  }, [W3CWebSocket]);
 
 
   const saveReplay = () => {
