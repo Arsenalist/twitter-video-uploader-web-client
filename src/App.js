@@ -6,9 +6,12 @@ import Table from "@material-ui/core/Table";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
+import MuiAlert from '@material-ui/lab/Alert';
+
 var client;
 function App() {
   const [tweet, setTweet] = useState([])
+  const [validationMessages, setValidationMessages] = useState([])
   const [timeMarkers, setTimeMarkers] = useState({})
   const [status, setStatus] = useState("")
 
@@ -75,10 +78,16 @@ function App() {
   const processVideo = (myId, action) => {
     const t = findById(myId);
     if (t.length !== 0) {
-      if (t[0].text) {
+      if (t[0].text && t[0].text.trim() !== '') {
         let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text, in_point: t[0].in_point, out_point: t[0].out_point});
         client.send(data);
         clearTweet(myId);
+      } else {
+        setValidationMessages(messages => {
+          const newMessages = [...messages]
+          newMessages[myId] = 'Enter a title';
+          return newMessages
+        })
       }
 
     }
@@ -156,6 +165,7 @@ function App() {
         <TableRow key={`row-${t.id}`}>
           <TableCell>
             <TextField key={`textfield-${t.id}`} className={classes.root} fullWidth label="Video title" variant="outlined" onChange={(e) => updateText(t.id, e.target.value)}  />
+            {validationMessages[t.id] && <MuiAlert severity="error">{validationMessages[t.id]}</MuiAlert>}
             {t.id}
           </TableCell>
           <TableCell>
