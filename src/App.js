@@ -5,6 +5,7 @@ import {Button, Container, TextField} from '@material-ui/core';
 import Table from "@material-ui/core/Table";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import TableBody from "@material-ui/core/TableBody";
 var client;
 function App() {
   const [tweet, setTweet] = useState([])
@@ -48,7 +49,7 @@ function App() {
       }
     };
 
-  }, []);
+  }, [W3CWebSocket, ]);
 
 
   const saveReplay = () => {
@@ -75,7 +76,7 @@ function App() {
     const t = findById(myId);
     if (t.length !== 0) {
       if (t[0].text) {
-        let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text, in_point: t[0].in, out_point: t[0].out});
+        let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text, in_point: t[0].in_point, out_point: t[0].out_point});
         client.send(data);
         clearTweet(myId);
       }
@@ -110,7 +111,7 @@ function App() {
       setTweet(old => {
         return old.map(t => {
           if (t.id === id) {
-            t.in = timeMarkers[id]
+            t.in_point = timeMarkers[id]
           }
           return t
         })
@@ -122,7 +123,7 @@ function App() {
       setTweet(old => {
         return old.map(t => {
           if (t.id === id) {
-            t.out = timeMarkers[id]
+            t.out_point = timeMarkers[id]
           }
           return t
         })
@@ -134,8 +135,8 @@ function App() {
     setTweet(old => {
       return old.map(t => {
         if (t.id === id) {
-          t.in = undefined
-          t.out = undefined
+          t.in_point = undefined
+          t.out_point = undefined
         }
         return t
       })
@@ -148,6 +149,7 @@ function App() {
       <Button color={"primary"} variant={"contained"} onClick={() => saveReplay()}>Save Replay</Button>
         <Button color={"primary"} variant={"contained"} onClick={() => saveVideo()}>Save Video</Button>
       <Table>
+        <TableBody>
       {
         tweet.map(t => (
       <>
@@ -162,8 +164,8 @@ function App() {
               Your browser does not support the video tag.
             </video>
             <div>
-            <Button size="small" variant={"outlined"} onClick={e => setIn(t.id, e)}>In {t.in}</Button>
-            <Button size="small" variant={"outlined"}  onClick={e => setOut(t.id, e)}>Out {t.out}</Button>
+            <Button size="small" variant={"outlined"} onClick={e => setIn(t.id, e)}>In {t.in_point}</Button>
+            <Button size="small" variant={"outlined"}  onClick={e => setOut(t.id, e)}>Out {t.out_point}</Button>
             <Button size="small" variant={"outlined"}  onClick={e => clear(t.id, e)}>Clear</Button>
             </div>
           </TableCell>
@@ -181,6 +183,7 @@ function App() {
 
         ))
       }
+        </TableBody>
       </Table>
       </Container>
   );
