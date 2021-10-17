@@ -187,6 +187,9 @@ function App() {
             <Button  className={classes.root}  size="small" color={"primary"} variant={"contained"}  onClick={() => processVideo(t.id, 'saveAndSendTweet')}>Send Tweet</Button>
           </TableCell>
           <TableCell>
+            <Button  className={classes.root}  size="small" color={"primary"} variant={"contained"}  onClick={() => processVideo(t.id, 'saveAndSendToYouTube')}>Send to YouTube</Button>
+          </TableCell>
+          <TableCell>
             <Button  className={classes.root}  size="small" color={"primary"} variant={"outlined"}  onClick={() => processVideo(t.id, 'saveVideoWithNameOnly')}>Save</Button>
           </TableCell>
           <TableCell>
@@ -194,7 +197,6 @@ function App() {
           </TableCell>
         </TableRow>
 </>
-
         ))
       }
         </TableBody>
