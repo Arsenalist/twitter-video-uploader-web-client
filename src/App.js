@@ -23,9 +23,8 @@ function App() {
     },
   }));
 
-  var W3CWebSocket = require('websocket').w3cwebsocket;
-
   useEffect(() => {
+    var W3CWebSocket = require('websocket').w3cwebsocket;
     client = new W3CWebSocket('ws://localhost:8888/', 'echo-protocol');
 
     client.onerror = function() {
@@ -56,7 +55,7 @@ function App() {
       }
     };
 
-  }, [W3CWebSocket]);
+  }, []);
 
 
   const saveReplay = () => {
@@ -160,9 +159,9 @@ function App() {
       <Container maxWidth="lg" className={classes.root}>
         <div id="status">{status}</div>
       <Button color={"primary"} variant={"contained"} onClick={() => saveReplay()}>Save Replay</Button>
-        <Button color={"primary"} variant={"contained"} onClick={() => saveVideo()}>Save Video</Button>
+      <Button color={"primary"} variant={"contained"} onClick={() => saveVideo()}>Save Video</Button>
       <Table>
-        <TableBody>
+        <TableBody key={"videos"}>
       {
         tweet.map(t => (
       <>
