@@ -82,7 +82,7 @@ function App() {
     const t = findById(myId);
     if (t.length !== 0) {
       if (t[0].text && t[0].text.trim() !== '') {
-        let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text, in_point: t[0].in_point, out_point: t[0].out_point});
+        let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text, in_point: t[0].in_point, out_point: t[0].out_point, tag: t[0].tag});
         client.send(data);
         clearTweet(myId);
       } else {
@@ -100,6 +100,17 @@ function App() {
     setTweet(old => old.filter(t => t.id !== myId))
   }
 
+
+  function updateTag(id, value) {
+    setTweet(old => {
+      return old.map(t => {
+        if (t.id === id) {
+          t.tag = value
+        }
+        return t
+      })
+    })
+  }
 
   function updateText(id, value) {
     setTweet(old => {
@@ -156,7 +167,7 @@ function App() {
   }
   const classes = useStyles();
   return (
-      <Container maxWidth="lg" className={classes.root}>
+      <Container maxWidth="xl" className={classes.root}>
         <div id="status">{status}</div>
       <Button color={"primary"} variant={"contained"} onClick={() => saveReplay()}>Save Replay</Button>
       <Button color={"primary"} variant={"contained"} onClick={() => saveVideo()}>Save Video</Button>
@@ -166,6 +177,10 @@ function App() {
         tweet.map(t => (
       <>
         <TableRow key={`row-${t.id}`}>
+          <TableCell>
+            <TextField key={`tag-${t.id}`} className={classes.root} fullWidth label="Video tag" variant="outlined" onChange={(e) => updateTag(t.id, e.target.value)}  />
+            Prefixed to file name for easier identification
+          </TableCell>
           <TableCell>
             <TextField key={`textfield-${t.id}`} className={classes.root} fullWidth label="Video title" variant="outlined" onChange={(e) => updateText(t.id, e.target.value)}  />
             {validationMessages[t.id] && <MuiAlert severity="error">{validationMessages[t.id]}</MuiAlert>}
