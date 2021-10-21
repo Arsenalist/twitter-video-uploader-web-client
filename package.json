@@ -11,11 +11,13 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.3",
+    "serve": "^12.0.1",
     "web-vitals": "^1.1.1",
     "websocket": "1.0.34"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm run build && node node_modules/serve/bin/serve.js -p 3000 -s build",
+    "quickstart": "node node_modules/serve/bin/serve.js -p 3000 -s build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
