@@ -7,12 +7,18 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import MuiAlert from '@material-ui/lab/Alert';
+import Grid from "@material-ui/core/Grid";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import Paper from "@material-ui/core/Paper";
 
 var client;
 function App() {
   const [tweet, setTweet] = useState([])
   const [validationMessages, setValidationMessages] = useState([])
   const [timeMarkers, setTimeMarkers] = useState({})
+  const [infoMessages, setInfoMessages] = useState([])
   const [status, setStatus] = useState("")
 
   const useStyles = makeStyles((theme) => ({
@@ -45,13 +51,21 @@ function App() {
     client.onmessage = function(e) {
       console.log("onmessage", e.data)
       const data = JSON.parse(e.data)
-      if (data.action === 'tweetRequest') {
+      if (data.action === 'videoInfoRequest') {
         const found = findById(data.id)
         if (found.length === 0) {
           let newTweet = [...tweet]
           newTweet.push({id: data.id, thumb: data.thumb})
           setTweet(t => [...t, ...newTweet])
         }
+      } else if (data.action === 'infoMessage') {
+          setInfoMessages(m => {
+            let newMessages = [...m]
+            const {message} = data;
+            newMessages.unshift(message);
+            console.log("new message: ", newMessages)
+            return newMessages
+          })
       }
     };
 
@@ -167,7 +181,9 @@ function App() {
   }
   const classes = useStyles();
   return (
-      <Container maxWidth="xl" className={classes.root}>
+      <Container maxWidth={"xl"}>
+      <Grid container spacing={15}>
+        <Grid spacing={3} component={Paper} item xs={9} className={classes.root}>
         <div id="status">{status}</div>
       <Button color={"primary"} variant={"contained"} onClick={() => saveReplay()}>Save Replay</Button>
       <Button color={"primary"} variant={"contained"} onClick={() => saveVideo()}>Save Video</Button>
@@ -215,6 +231,17 @@ function App() {
       }
         </TableBody>
       </Table>
+      </Grid>
+        <Grid spacing={3} component={Paper} item xs={3} className={classes.root}>
+          <List dense={true}>
+            {infoMessages.map(m =>
+                <ListItem>
+                  <ListItemText primary={m} />
+                </ListItem>
+            )}
+          </List>
+        </Grid>
+      </Grid>
       </Container>
   );
 }
