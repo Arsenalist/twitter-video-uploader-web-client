@@ -12,7 +12,25 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Paper from "@material-ui/core/Paper";
+import {textToTags} from "./textToTags";
+import { uniq } from 'lodash';
 
+const playersToTagMap = [
+  {"precious achiuwa": "precious"},
+  {"og anunoby": "og"},
+  {"dalano banton": "banton"},
+  {"scottie barnes": "barnes"},
+  {"khem birch": "birch"},
+  {"isaac bonga": "bonga"},
+  {"chris boucher": "boucher"},
+  {"justin champagnie": "champagnie"},
+  {"dekker": "dekker"},
+  {"goran dragic": "dragic"},
+  {"malachi flynn": "flynn"},
+  {"svi mykhailiuk": "svi"},
+  {"pascal siakam": "siakam"},
+  {"fred vanvleet fred": "fred"},
+  {"yuta watanabe": "yuta"}]
 var client;
 function App() {
   const [tweet, setTweet] = useState([])
@@ -96,7 +114,10 @@ function App() {
     const t = findById(myId);
     if (t.length !== 0) {
       if (t[0].text && t[0].text.trim() !== '') {
-        let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text, in_point: t[0].in_point, out_point: t[0].out_point, tag: t[0].tag});
+        const extractedTags = textToTags(t[0].text, playersToTagMap);
+        const specifiedTags = t[0].tag === undefined ? [] : t[0].tag.split(/[\s,]+/);
+        const allTags = extractedTags.concat(specifiedTags);
+        let data = JSON.stringify({action: action, id: t[0].id, text: t[0].text, in_point: t[0].in_point, out_point: t[0].out_point, tag: uniq(allTags).join(" ")});
         client.send(data);
         clearTweet(myId);
       } else {
@@ -131,6 +152,7 @@ function App() {
       return old.map(t => {
         if (t.id === id) {
           t.text = value
+          t.autoTags = textToTags(value, playersToTagMap).join(" ");
         }
         return t
       })
@@ -194,8 +216,8 @@ function App() {
       <>
         <TableRow key={`row-${t.id}`}>
           <TableCell>
-            <TextField key={`tag-${t.id}`} className={classes.root} fullWidth label="Video tag" variant="outlined" onChange={(e) => updateTag(t.id, e.target.value)}  />
-            Prefixed to file name for easier identification
+            <TextField key={`tag-${t.id}`} className={classes.root} fullWidth label="Video tags" variant="outlined" onChange={(e) => updateTag(t.id, e.target.value)}  />
+            {t.autoTags}
           </TableCell>
           <TableCell>
             <TextField key={`textfield-${t.id}`} className={classes.root} fullWidth label="Video title" variant="outlined" onChange={(e) => updateText(t.id, e.target.value)}  />
