@@ -73,8 +73,10 @@ function App() {
         const found = findById(data.id)
         if (found.length === 0) {
           let newTweet = [...tweet]
-          newTweet.push({id: data.id, thumb: data.thumb})
-          setTweet(t => [...t, ...newTweet])
+          if (!newTweet.includes(data.id)) {
+            newTweet.push({id: data.id, thumb: data.thumb})
+            setTweet(t => [...t, ...newTweet])
+          }
         }
       } else if (data.action === 'infoMessage') {
           setInfoMessages(m => {
