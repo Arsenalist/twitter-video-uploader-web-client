@@ -29,6 +29,7 @@ const playersToTagMap = [
   {"malachi flynn": "flynn"},
   {"svi mykhailiuk": "svi"},
   {"pascal siakam": "siakam"},
+  {"gary trent": "trent"},
   {"fred vanvleet fred": "fred"},
   {"yuta watanabe": "yuta"}]
 var client;
